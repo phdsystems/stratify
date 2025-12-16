@@ -1,11 +1,11 @@
 package dev.engineeringlab.stratify.plugin.maven;
 
 import dev.engineeringlab.stratify.plugin.scanner.ModuleScanner;
-import dev.engineeringlab.stratify.plugin.scanner.ScanResult;
+import dev.engineeringlab.stratify.plugin.scanner.ModuleScanner.ModuleInfo;
+import dev.engineeringlab.stratify.plugin.validator.DependencyValidator;
+import dev.engineeringlab.stratify.plugin.validator.ModuleStructureValidator;
+import dev.engineeringlab.stratify.plugin.validator.NamingValidator;
 import dev.engineeringlab.stratify.plugin.validator.ValidationResult;
-import dev.engineeringlab.stratify.plugin.validator.Validator;
-import dev.engineeringlab.stratify.plugin.validator.ValidatorEngine;
-import dev.engineeringlab.stratify.plugin.validator.Severity;
 import dev.engineeringlab.stratify.plugin.reporter.ConsoleReporter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -16,38 +16,27 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Validates SEA compliance by scanning modules and running validators.
- * Fails the build if violations of ERROR severity are found (or WARNING if failOnWarning is enabled).
+ * Fails the build if violations of ERROR severity are found.
  */
 @Mojo(name = "validate", defaultPhase = LifecyclePhase.VALIDATE)
 public class StratifyValidateMojo extends AbstractMojo {
 
-    /**
-     * The Maven project.
-     */
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
-    /**
-     * Whether to fail the build on WARNING severity violations.
-     */
     @Parameter(property = "stratify.failOnWarning", defaultValue = "false")
     private boolean failOnWarning;
 
-    /**
-     * Whether to skip validation.
-     */
     @Parameter(property = "stratify.skip", defaultValue = "false")
     private boolean skip;
 
-    /**
-     * Source directories to scan.
-     */
-    @Parameter(defaultValue = "${project.build.sourceDirectory}")
-    private File sourceDirectory;
+    @Parameter(defaultValue = "${project.basedir}")
+    private File baseDirectory;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -57,44 +46,53 @@ public class StratifyValidateMojo extends AbstractMojo {
         }
 
         getLog().info("Running Stratify SEA compliance validation...");
-        getLog().info("Source directory: " + sourceDirectory);
+        getLog().info("Base directory: " + baseDirectory);
 
         try {
             // Scan modules
             ModuleScanner scanner = new ModuleScanner();
-            ScanResult scanResult = scanner.scan(sourceDirectory.toPath());
+            List<ModuleInfo> modules = scanner.scanModules(baseDirectory.toPath());
 
-            getLog().info("Found " + scanResult.getModules().size() + " modules");
+            getLog().info("Found " + modules.size() + " modules");
 
-            // Run validators
-            ValidatorEngine engine = new ValidatorEngine();
-            List<Validator> validators = engine.getValidators();
-            getLog().info("Running " + validators.size() + " validators");
+            // Run all validators
+            List<ValidationResult> allResults = new ArrayList<>();
 
-            ValidationResult validationResult = engine.validate(scanResult);
+            ModuleStructureValidator structureValidator = new ModuleStructureValidator();
+            allResults.addAll(structureValidator.validate(modules));
+
+            NamingValidator namingValidator = new NamingValidator();
+            allResults.addAll(namingValidator.validate(modules));
+
+            DependencyValidator dependencyValidator = new DependencyValidator();
+            allResults.addAll(dependencyValidator.validate(modules));
+
+            getLog().info("Ran 3 validators, found " + allResults.size() + " issues");
 
             // Report results
-            ConsoleReporter reporter = new ConsoleReporter(getLog()::info);
-            reporter.report(validationResult);
+            ConsoleReporter reporter = new ConsoleReporter();
+            reporter.report(allResults);
 
             // Check for failures
-            boolean hasErrors = validationResult.getViolations().stream()
-                    .anyMatch(v -> v.getSeverity() == Severity.ERROR);
-            boolean hasWarnings = validationResult.getViolations().stream()
-                    .anyMatch(v -> v.getSeverity() == Severity.WARNING);
+            long errorCount = allResults.stream()
+                    .filter(r -> r.severity() == ValidationResult.Severity.ERROR)
+                    .count();
+            long warningCount = allResults.stream()
+                    .filter(r -> r.severity() == ValidationResult.Severity.WARNING)
+                    .count();
 
-            if (hasErrors) {
-                throw new MojoFailureException("SEA validation failed with ERROR violations");
+            if (errorCount > 0) {
+                throw new MojoFailureException("SEA validation failed with " + errorCount + " errors");
             }
 
-            if (failOnWarning && hasWarnings) {
-                throw new MojoFailureException("SEA validation failed with WARNING violations (failOnWarning=true)");
+            if (failOnWarning && warningCount > 0) {
+                throw new MojoFailureException("SEA validation failed with " + warningCount + " warnings (failOnWarning=true)");
             }
 
-            if (validationResult.getViolations().isEmpty()) {
-                getLog().info("SEA validation passed - no violations found");
+            if (allResults.isEmpty()) {
+                getLog().info("SEA validation passed - no issues found");
             } else {
-                getLog().info("SEA validation passed with warnings");
+                getLog().info("SEA validation passed with " + warningCount + " warnings");
             }
 
         } catch (MojoFailureException e) {

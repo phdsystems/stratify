@@ -1,9 +1,7 @@
 package dev.engineeringlab.stratify.plugin.maven;
 
 import dev.engineeringlab.stratify.plugin.scanner.ModuleScanner;
-import dev.engineeringlab.stratify.plugin.scanner.ScanResult;
-import dev.engineeringlab.stratify.plugin.scanner.ModuleInfo;
-import dev.engineeringlab.stratify.plugin.reporter.ConsoleReporter;
+import dev.engineeringlab.stratify.plugin.scanner.ModuleScanner.ModuleInfo;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -11,6 +9,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Scans and reports the module structure without performing validation.
@@ -19,21 +18,12 @@ import java.io.File;
 @Mojo(name = "scan")
 public class StrategyScanMojo extends AbstractMojo {
 
-    /**
-     * The Maven project.
-     */
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
-    /**
-     * Source directories to scan.
-     */
-    @Parameter(defaultValue = "${project.build.sourceDirectory}")
-    private File sourceDirectory;
+    @Parameter(defaultValue = "${project.basedir}")
+    private File baseDirectory;
 
-    /**
-     * Whether to skip scanning.
-     */
     @Parameter(property = "stratify.skip", defaultValue = "false")
     private boolean skip;
 
@@ -45,22 +35,20 @@ public class StrategyScanMojo extends AbstractMojo {
         }
 
         getLog().info("Scanning SEA module structure...");
-        getLog().info("Source directory: " + sourceDirectory);
+        getLog().info("Base directory: " + baseDirectory);
 
         try {
-            // Scan modules
             ModuleScanner scanner = new ModuleScanner();
-            ScanResult scanResult = scanner.scan(sourceDirectory.toPath());
+            List<ModuleInfo> modules = scanner.scanModules(baseDirectory.toPath());
 
-            // Report findings
             getLog().info("=== Module Scan Results ===");
-            getLog().info("Total modules found: " + scanResult.getModules().size());
+            getLog().info("Total modules found: " + modules.size());
             getLog().info("");
 
-            if (scanResult.getModules().isEmpty()) {
-                getLog().warn("No SEA modules found. Ensure classes are annotated with @SEAModule");
+            if (modules.isEmpty()) {
+                getLog().warn("No SEA modules found in " + baseDirectory);
             } else {
-                for (ModuleInfo module : scanResult.getModules()) {
+                for (ModuleInfo module : modules) {
                     reportModule(module);
                 }
             }
@@ -73,14 +61,14 @@ public class StrategyScanMojo extends AbstractMojo {
     }
 
     private void reportModule(ModuleInfo module) {
-        getLog().info("Module: " + module.getName());
-        getLog().info("  Type: " + module.getType());
-        getLog().info("  Layer: " + module.getLayer());
-        getLog().info("  Exports: " + module.getExports().size() + " items");
-        getLog().info("  Dependencies: " + module.getDependencies().size() + " modules");
+        getLog().info("Module: " + module.artifactId());
+        getLog().info("  Group: " + module.groupId());
+        getLog().info("  Layer: " + module.layer());
+        getLog().info("  Path: " + module.path());
+        getLog().info("  Dependencies: " + module.dependencies().size());
 
-        if (!module.getDependencies().isEmpty()) {
-            getLog().info("    -> " + String.join(", ", module.getDependencies()));
+        if (!module.dependencies().isEmpty()) {
+            getLog().info("    -> " + String.join(", ", module.dependencies()));
         }
 
         getLog().info("");

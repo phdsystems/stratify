@@ -1,0 +1,14 @@
+dev/engineeringlab/stratify/plugin/reporter/ConsoleReporter.class
+dev/engineeringlab/stratify/plugin/reporter/ConsoleReporter$1.class
+dev/engineeringlab/stratify/plugin/validator/NamingValidator.class
+dev/engineeringlab/stratify/plugin/validator/ValidationResult.class
+dev/engineeringlab/stratify/plugin/validator/ValidationResult$Severity.class
+dev/engineeringlab/stratify/plugin/validator/ModuleStructureValidator.class
+dev/engineeringlab/stratify/plugin/scanner/BuildFileScanner.class
+dev/engineeringlab/stratify/plugin/scanner/ModuleScanner$ModuleLayer.class
+dev/engineeringlab/stratify/plugin/reporter/JsonReporter.class
+dev/engineeringlab/stratify/plugin/scanner/ModuleScanner$ModuleInfo.class
+dev/engineeringlab/stratify/plugin/scanner/BuildFileScanner$BuildFileInfo.class
+dev/engineeringlab/stratify/plugin/scanner/ModuleScanner.class
+dev/engineeringlab/stratify/plugin/validator/NamingValidator$1.class
+dev/engineeringlab/stratify/plugin/validator/DependencyValidator.class

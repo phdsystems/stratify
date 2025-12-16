@@ -1,0 +1,8 @@
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/reporter/ConsoleReporter.java
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/reporter/JsonReporter.java
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/scanner/BuildFileScanner.java
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/scanner/ModuleScanner.java
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/validator/DependencyValidator.java
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/validator/ModuleStructureValidator.java
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/validator/NamingValidator.java
+/home/adentic/stratify/stratify-plugin-core/src/main/java/dev/engineeringlab/stratify/plugin/validator/ValidationResult.java

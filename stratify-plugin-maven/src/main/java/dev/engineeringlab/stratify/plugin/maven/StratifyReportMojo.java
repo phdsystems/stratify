@@ -1,9 +1,11 @@
 package dev.engineeringlab.stratify.plugin.maven;
 
 import dev.engineeringlab.stratify.plugin.scanner.ModuleScanner;
-import dev.engineeringlab.stratify.plugin.scanner.ScanResult;
+import dev.engineeringlab.stratify.plugin.scanner.ModuleScanner.ModuleInfo;
+import dev.engineeringlab.stratify.plugin.validator.DependencyValidator;
+import dev.engineeringlab.stratify.plugin.validator.ModuleStructureValidator;
+import dev.engineeringlab.stratify.plugin.validator.NamingValidator;
 import dev.engineeringlab.stratify.plugin.validator.ValidationResult;
-import dev.engineeringlab.stratify.plugin.validator.ValidatorEngine;
 import dev.engineeringlab.stratify.plugin.reporter.JsonReporter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -12,39 +14,27 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generates a JSON report of SEA validation results.
- * The report includes module structure and validation violations.
  * Does not fail the build.
  */
 @Mojo(name = "report")
 public class StratifyReportMojo extends AbstractMojo {
 
-    /**
-     * The Maven project.
-     */
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
-    /**
-     * Source directories to scan.
-     */
-    @Parameter(defaultValue = "${project.build.sourceDirectory}")
-    private File sourceDirectory;
+    @Parameter(defaultValue = "${project.basedir}")
+    private File baseDirectory;
 
-    /**
-     * Output file for the JSON report.
-     */
     @Parameter(defaultValue = "${project.build.directory}/stratify-report.json")
     private File outputFile;
 
-    /**
-     * Whether to skip report generation.
-     */
     @Parameter(property = "stratify.skip", defaultValue = "false")
     private boolean skip;
 
@@ -56,7 +46,7 @@ public class StratifyReportMojo extends AbstractMojo {
         }
 
         getLog().info("Generating Stratify SEA compliance report...");
-        getLog().info("Source directory: " + sourceDirectory);
+        getLog().info("Base directory: " + baseDirectory);
         getLog().info("Output file: " + outputFile);
 
         try {
@@ -66,24 +56,25 @@ public class StratifyReportMojo extends AbstractMojo {
 
             // Scan modules
             ModuleScanner scanner = new ModuleScanner();
-            ScanResult scanResult = scanner.scan(sourceDirectory.toPath());
+            List<ModuleInfo> modules = scanner.scanModules(baseDirectory.toPath());
 
-            getLog().info("Scanned " + scanResult.getModules().size() + " modules");
+            getLog().info("Scanned " + modules.size() + " modules");
 
-            // Run validators
-            ValidatorEngine engine = new ValidatorEngine();
-            ValidationResult validationResult = engine.validate(scanResult);
+            // Run all validators
+            List<ValidationResult> allResults = new ArrayList<>();
 
-            getLog().info("Found " + validationResult.getViolations().size() + " violations");
+            allResults.addAll(new ModuleStructureValidator().validate(modules));
+            allResults.addAll(new NamingValidator().validate(modules));
+            allResults.addAll(new DependencyValidator().validate(modules));
+
+            getLog().info("Found " + allResults.size() + " issues");
 
             // Generate JSON report
             JsonReporter reporter = new JsonReporter();
-            reporter.report(validationResult, outputPath);
+            reporter.reportToFile(allResults, outputPath);
 
-            getLog().info("Report generated successfully: " + outputFile.getAbsolutePath());
+            getLog().info("Report generated: " + outputFile.getAbsolutePath());
 
-        } catch (IOException e) {
-            throw new MojoExecutionException("Failed to write report: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new MojoExecutionException("Report generation failed: " + e.getMessage(), e);
         }
