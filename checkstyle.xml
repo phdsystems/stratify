@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+
+    <property name="severity" value="warning"/>
+
+    <property name="fileExtensions" value="java, properties, xml"/>
+
+    <!-- Excludes all 'module-info.java' files -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module-info.java"/>
+    </module>
+
+    <!-- Checks for whitespace                               -->
+    <!-- See http://checkstyle.sourceforge.net/config_whitespace.html -->
+    <module name="FileTabCharacter"/>
+
+    <module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|value=&quot;.*&quot;|//.*|.*String\.format.*|.*\+\s*$"/>
+    </module>
+
+    <!-- Enable @SuppressWarnings annotation filtering -->
+    <module name="SuppressWarningsFilter"/>
+
+    <module name="TreeWalker">
+        <!-- Enable @SuppressWarnings annotation support -->
+        <module name="SuppressWarningsHolder"/>
+
+        <module name="LocalVariableName"/>
+        <module name="MethodName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+
+        <!-- Checks for Javadoc comments.                     -->
+        <!-- See http://checkstyle.sourceforge.net/config_javadoc.html -->
+        <module name="JavadocMethod">
+            <property name="allowMissingParamTags" value="true"/>
+            <property name="allowMissingReturnTag" value="true"/>
+        </module>
+        <module name="JavadocVariable">
+            <!-- Exclude enum constants from Javadoc requirement -->
+            <property name="excludeScope" value="private"/>
+            <property name="ignoreNamePattern" value="^[A-Z][A-Z0-9_]*$"/>
+            <property name="scope" value="public"/>
+        </module>
+
+        <!-- Checks for Naming Conventions.                  -->
+        <!-- See http://checkstyle.sourceforge.net/config_naming.html -->
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="MemberName"/>
+        <module name="PackageName"/>
+        <module name="StaticVariableName"/>
+
+        <!-- Checks for imports                              -->
+        <!-- See http://checkstyle.sourceforge.net/config_imports.html -->
+        <module name="AvoidStarImport"/>
+        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+
+        <!-- Prevent fully qualified class names in implements/extends clauses -->
+        <!-- Use simple names instead of package.qualified.ClassName -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(implements|extends)\s+([a-z]+\.)+[A-Z]"/>
+            <property name="message" value="Avoid fully qualified class names in implements/extends clauses. Use simple names and proper imports instead."/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Prevent fully qualified class names in code (method bodies, field declarations, etc.) -->
+        <!-- Example violation: builder.updatePolicy(dev.engineeringlab.package.UpdatePolicy.valueOf(policy)) -->
+        <!-- Should be: import UpdatePolicy; builder.updatePolicy(UpdatePolicy.valueOf(policy)) -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="[^a-zA-Z](([a-z]+\.){2,}[A-Z][a-zA-Z0-9_]*)\s*[\.\(]"/>
+            <property name="message" value="Avoid fully qualified class names in code. Use simple names with proper imports instead. Example: Use 'UpdatePolicy.valueOf()' with import, not 'dev.package.UpdatePolicy.valueOf()'."/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Checks for Size Violations.                    -->
+        <!-- See http://checkstyle.sourceforge.net/config_sizes.html -->
+        <module name="MethodLength">
+            <property name="max" value="200"/>
+        </module>
+        <module name="ParameterNumber"/>
+
+        <!-- Checks for whitespace                               -->
+        <!-- See http://checkstyle.sourceforge.net/config_whitespace.html -->
+        <module name="EmptyForInitializerPad"/>
+        <module name="EmptyForIteratorPad"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <!-- WhitespaceAround disabled - Spotless handles formatting -->
+        <!-- <module name="WhitespaceAround"/> -->
+
+        <!-- Modifier Checks                                    -->
+        <!-- See http://checkstyle.sourceforge.net/config_modifiers.html -->
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+
+        <!-- Checks for blocks. You know, those {} things.       -->
+        <!-- See http://checkstyle.sourceforge.net/config_blocks.html -->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="LeftCurly"/>
+        <module name="NeedBraces"/>
+        <module name="RightCurly"/>
+
+        <!-- Checks for common coding problems.               -->
+        <!-- See http://checkstyle.sourceforge.net/config_coding.html -->
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="HiddenField">
+            <!-- Allow constructor parameters and setters to hide fields (common DTO/Record pattern) -->
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+            <property name="setterCanReturnItsClass" value="true"/>
+            <property name="ignoreAbstractMethods" value="true"/>
+            <property name="tokens" value="VARIABLE_DEF, LAMBDA, PATTERN_VARIABLE_DEF"/>
+        </module>
+        <module name="IllegalInstantiation"/>
+        <module name="InnerAssignment"/>
+        <!-- MagicNumber disabled - too restrictive for configuration defaults and method parameters -->
+        <!-- <module name="MagicNumber">
+            <property name="ignoreFieldDeclaration" value="true"/>
+            <property name="ignoreAnnotation" value="true"/>
+            <property name="ignoreHashCodeMethod" value="true"/>
+        </module> -->
+        <module name="MissingSwitchDefault"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+
+        <!-- Checks for class design                         -->
+        <!-- See http://checkstyle.sourceforge.net/config_design.html -->
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor"/>
+        <module name="InterfaceIsType"/>
+        <module name="VisibilityModifier">
+            <!-- Allow protected fields in abstract classes -->
+            <property name="protectedAllowed" value="true"/>
+            <!-- Allow package-private fields in tests and internal classes -->
+            <property name="packageAllowed" value="true"/>
+        </module>
+
+        <!-- Miscellaneous other checks.                   -->
+        <!-- See http://checkstyle.sourceforge.net/config_misc.html -->
+        <module name="ArrayTypeStyle"/>
+        <!-- TodoComment disabled - TODO comments are valid development markers -->
+        <!-- <module name="TodoComment"/> -->
+        <module name="UpperEll"/>
+    </module>
+</module>
