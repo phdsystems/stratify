@@ -1,9 +1,0 @@
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/config/ConfigLoader.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/config/StratifyConfig.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/error/ErrorCode.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/error/StratifyException.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/provider/ProviderBase.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/provider/ProviderDiscovery.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/registry/ProviderRegistry.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/registry/Registry.java
-/home/adentic/stratify/stratify-core/src/main/java/dev/engineeringlab/stratify/registry/RegistryBuilder.java
