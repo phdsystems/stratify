@@ -18,6 +18,6 @@
     <description>Reference implementations demonstrating SEA at different scales</description>
 
     <modules>
-        <module>example-text-processor</module>
+        <!-- Examples are standalone projects, not included in reactor build -->
     </modules>
 </project>
