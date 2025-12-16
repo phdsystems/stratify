@@ -6,18 +6,22 @@
 
     <parent>
         <groupId>dev.engineeringlab</groupId>
-        <artifactId>stratify-parent</artifactId>
+        <artifactId>stratify-examples</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>stratify-examples</artifactId>
+    <artifactId>example-text-processor-parent</artifactId>
     <packaging>pom</packaging>
 
-    <name>Stratify Examples</name>
-    <description>Reference implementations demonstrating SEA at different scales</description>
+    <name>Text Processor Example</name>
+    <description>Complete SEA example demonstrating all 5 layers</description>
 
     <modules>
-        <module>example-text-processor</module>
+        <module>text-processor-common</module>
+        <module>text-processor-spi</module>
+        <module>text-processor-api</module>
+        <module>text-processor-core</module>
+        <module>text-processor-facade</module>
     </modules>
 </project>
