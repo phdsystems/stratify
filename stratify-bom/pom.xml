@@ -30,18 +30,6 @@
                 <version>${stratify.version}</version>
             </dependency>
 
-            <!-- Plugin Modules -->
-            <dependency>
-                <groupId>dev.engineeringlab</groupId>
-                <artifactId>stratify-plugin-core</artifactId>
-                <version>${stratify.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>dev.engineeringlab</groupId>
-                <artifactId>stratify-plugin-maven</artifactId>
-                <version>${stratify.version}</version>
-            </dependency>
-
             <!-- Testing Modules -->
             <dependency>
                 <groupId>dev.engineeringlab</groupId>
