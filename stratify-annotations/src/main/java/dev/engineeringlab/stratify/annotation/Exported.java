@@ -9,14 +9,15 @@ import java.lang.annotation.Target;
 /**
  * Marks a type as explicitly exported in the public API.
  *
- * <p>Types marked with {@code @Exported} are part of the module's stable
- * public API. They are intended to be used by consumers and will maintain
- * backward compatibility within the same major version.
+ * <p>Types marked with {@code @Exported} are part of the module's stable public API. They are
+ * intended to be used by consumers and will maintain backward compatibility within the same major
+ * version.
  *
- * <p>This annotation is typically used on types in lower layers (COMMON, API)
- * that are re-exported through the FACADE layer.
+ * <p>This annotation is typically used on types in lower layers (COMMON, API) that are re-exported
+ * through the FACADE layer.
  *
  * <p>Example usage:
+ *
  * <pre>
  * {@literal @}Exported
  * public record TextGenerationRequest(
@@ -27,11 +28,12 @@ import java.lang.annotation.Target;
  * </pre>
  *
  * <p>Tooling can use this annotation to:
+ *
  * <ul>
- *   <li>Generate API documentation</li>
- *   <li>Validate that exported types follow naming conventions</li>
- *   <li>Check backward compatibility between versions</li>
- *   <li>Ensure exports are properly re-exported through facade</li>
+ *   <li>Generate API documentation
+ *   <li>Validate that exported types follow naming conventions
+ *   <li>Check backward compatibility between versions
+ *   <li>Ensure exports are properly re-exported through facade
  * </ul>
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
@@ -39,37 +41,29 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Exported {
 
-    /**
-     * Version when this type was first exported.
-     *
-     * @return the version string
-     */
-    String since() default "";
+  /**
+   * Version when this type was first exported.
+   *
+   * @return the version string
+   */
+  String since() default "";
 
-    /**
-     * Stability level of this export.
-     *
-     * @return the stability level
-     */
-    Stability stability() default Stability.STABLE;
+  /**
+   * Stability level of this export.
+   *
+   * @return the stability level
+   */
+  Stability stability() default Stability.STABLE;
 
-    /**
-     * Stability levels for exported types.
-     */
-    enum Stability {
-        /**
-         * Fully stable, backward compatible within major version.
-         */
-        STABLE,
+  /** Stability levels for exported types. */
+  enum Stability {
+    /** Fully stable, backward compatible within major version. */
+    STABLE,
 
-        /**
-         * API may change in minor versions. Use with caution.
-         */
-        BETA,
+    /** API may change in minor versions. Use with caution. */
+    BETA,
 
-        /**
-         * Experimental API, may change or be removed at any time.
-         */
-        EXPERIMENTAL
-    }
+    /** Experimental API, may change or be removed at any time. */
+    EXPERIMENTAL
+  }
 }

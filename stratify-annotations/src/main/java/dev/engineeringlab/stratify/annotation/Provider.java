@@ -9,11 +9,12 @@ import java.lang.annotation.Target;
 /**
  * Marks a class as an SPI provider implementation.
  *
- * <p>Providers are implementations of SPI (Service Provider Interface) contracts
- * that can be discovered and loaded at runtime. This annotation provides metadata
- * for provider discovery, selection, and management.
+ * <p>Providers are implementations of SPI (Service Provider Interface) contracts that can be
+ * discovered and loaded at runtime. This annotation provides metadata for provider discovery,
+ * selection, and management.
  *
  * <p>Example usage:
+ *
  * <pre>
  * {@literal @}Provider(
  *     name = "openai",
@@ -25,50 +26,53 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * <p>Providers are typically discovered via ServiceLoader or annotation scanning
- * and selected based on priority (higher priority = preferred).
+ * <p>Providers are typically discovered via ServiceLoader or annotation scanning and selected based
+ * on priority (higher priority = preferred).
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Provider {
 
-    /**
-     * Unique identifier for this provider.
-     * <p>Used for explicit provider selection and configuration lookup.
-     *
-     * @return the provider name
-     */
-    String name();
+  /**
+   * Unique identifier for this provider.
+   *
+   * <p>Used for explicit provider selection and configuration lookup.
+   *
+   * @return the provider name
+   */
+  String name();
 
-    /**
-     * Provider selection priority (higher = more preferred).
-     * <p>When multiple providers are available, the one with highest priority
-     * is selected as the default.
-     *
-     * @return the priority value (default: 0)
-     */
-    int priority() default 0;
+  /**
+   * Provider selection priority (higher = more preferred).
+   *
+   * <p>When multiple providers are available, the one with highest priority is selected as the
+   * default.
+   *
+   * @return the priority value (default: 0)
+   */
+  int priority() default 0;
 
-    /**
-     * Human-readable description of the provider.
-     *
-     * @return the description
-     */
-    String description() default "";
+  /**
+   * Human-readable description of the provider.
+   *
+   * @return the description
+   */
+  String description() default "";
 
-    /**
-     * Whether this provider is enabled by default.
-     * <p>Disabled providers must be explicitly enabled via configuration.
-     *
-     * @return true if enabled by default
-     */
-    boolean enabledByDefault() default true;
+  /**
+   * Whether this provider is enabled by default.
+   *
+   * <p>Disabled providers must be explicitly enabled via configuration.
+   *
+   * @return true if enabled by default
+   */
+  boolean enabledByDefault() default true;
 
-    /**
-     * Optional tags for categorization and filtering.
-     *
-     * @return array of tags
-     */
-    String[] tags() default {};
+  /**
+   * Optional tags for categorization and filtering.
+   *
+   * @return array of tags
+   */
+  String[] tags() default {};
 }

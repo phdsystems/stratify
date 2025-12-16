@@ -10,15 +10,15 @@ import java.util.Objects;
  */
 public record ProcessRequest(String text, String processorType) {
 
-    public ProcessRequest {
-        Objects.requireNonNull(text, "text cannot be null");
-        Objects.requireNonNull(processorType, "processorType cannot be null");
+  public ProcessRequest {
+    Objects.requireNonNull(text, "text cannot be null");
+    Objects.requireNonNull(processorType, "processorType cannot be null");
 
-        if (text.isBlank()) {
-            throw new IllegalArgumentException("text cannot be blank");
-        }
-        if (processorType.isBlank()) {
-            throw new IllegalArgumentException("processorType cannot be blank");
-        }
+    if (text.isBlank()) {
+      throw new IllegalArgumentException("text cannot be blank");
     }
+    if (processorType.isBlank()) {
+      throw new IllegalArgumentException("processorType cannot be blank");
+    }
+  }
 }

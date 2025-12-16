@@ -11,9 +11,9 @@ import java.util.Objects;
  */
 public record ProcessResult(String originalText, String processedText, String processorUsed) {
 
-    public ProcessResult {
-        Objects.requireNonNull(originalText, "originalText cannot be null");
-        Objects.requireNonNull(processedText, "processedText cannot be null");
-        Objects.requireNonNull(processorUsed, "processorUsed cannot be null");
-    }
+  public ProcessResult {
+    Objects.requireNonNull(originalText, "originalText cannot be null");
+    Objects.requireNonNull(processedText, "processedText cannot be null");
+    Objects.requireNonNull(processorUsed, "processorUsed cannot be null");
+  }
 }

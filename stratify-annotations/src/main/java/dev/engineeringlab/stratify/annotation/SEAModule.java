@@ -9,11 +9,11 @@ import java.lang.annotation.Target;
 /**
  * Marks a package or module as belonging to a specific SEA layer.
  *
- * <p>This annotation is used to declare the architectural role of a module
- * within the Stratified Encapsulation Architecture. It enables build-time
- * and runtime validation of layer dependencies.
+ * <p>This annotation is used to declare the architectural role of a module within the Stratified
+ * Encapsulation Architecture. It enables build-time and runtime validation of layer dependencies.
  *
  * <p>Example usage on a package-info.java:
+ *
  * <pre>
  * {@literal @}SEAModule(layer = Layer.FACADE)
  * package com.example.mymodule;
@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
  * </pre>
  *
  * <p>Example usage on a module class:
+ *
  * <pre>
  * {@literal @}SEAModule(layer = Layer.CORE, name = "my-module-core")
  * public class MyModuleCore {
@@ -35,25 +36,26 @@ import java.lang.annotation.Target;
 @Documented
 public @interface SEAModule {
 
-    /**
-     * The SEA layer this module belongs to.
-     *
-     * @return the layer designation
-     */
-    Layer layer();
+  /**
+   * The SEA layer this module belongs to.
+   *
+   * @return the layer designation
+   */
+  Layer layer();
 
-    /**
-     * Optional module name for identification.
-     * <p>If not specified, the name is derived from the package or class name.
-     *
-     * @return the module name
-     */
-    String name() default "";
+  /**
+   * Optional module name for identification.
+   *
+   * <p>If not specified, the name is derived from the package or class name.
+   *
+   * @return the module name
+   */
+  String name() default "";
 
-    /**
-     * Optional description of the module's purpose.
-     *
-     * @return the module description
-     */
-    String description() default "";
+  /**
+   * Optional description of the module's purpose.
+   *
+   * @return the module description
+   */
+  String description() default "";
 }

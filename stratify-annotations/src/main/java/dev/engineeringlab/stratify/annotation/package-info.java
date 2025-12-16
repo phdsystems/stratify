@@ -1,20 +1,24 @@
 /**
  * Annotations for the Stratified Encapsulation Architecture (SEA).
  *
- * <p>This package provides compile-time and runtime annotations for marking
- * and validating SEA module layers and components.
+ * <p>This package provides compile-time and runtime annotations for marking and validating SEA
+ * module layers and components.
  *
  * <h2>Core Annotations</h2>
+ *
  * <ul>
- *   <li>{@link dev.engineeringlab.stratify.annotation.SEAModule} - Marks a module's layer</li>
- *   <li>{@link dev.engineeringlab.stratify.annotation.Layer} - Enum of the 5 SEA layers</li>
- *   <li>{@link dev.engineeringlab.stratify.annotation.Provider} - Marks SPI provider implementations</li>
- *   <li>{@link dev.engineeringlab.stratify.annotation.Facade} - Marks facade entry points</li>
- *   <li>{@link dev.engineeringlab.stratify.annotation.Internal} - Marks internal implementation details</li>
- *   <li>{@link dev.engineeringlab.stratify.annotation.Exported} - Marks explicitly exported types</li>
+ *   <li>{@link dev.engineeringlab.stratify.annotation.SEAModule} - Marks a module's layer
+ *   <li>{@link dev.engineeringlab.stratify.annotation.Layer} - Enum of the 5 SEA layers
+ *   <li>{@link dev.engineeringlab.stratify.annotation.Provider} - Marks SPI provider
+ *       implementations
+ *   <li>{@link dev.engineeringlab.stratify.annotation.Facade} - Marks facade entry points
+ *   <li>{@link dev.engineeringlab.stratify.annotation.Internal} - Marks internal implementation
+ *       details
+ *   <li>{@link dev.engineeringlab.stratify.annotation.Exported} - Marks explicitly exported types
  * </ul>
  *
  * <h2>SEA Layer Hierarchy</h2>
+ *
  * <pre>
  * L5: FACADE  - Consumer entry point (ONLY externally visible)
  * L4: CORE    - Implementation (exports nothing directly)
