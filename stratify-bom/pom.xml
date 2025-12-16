@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dev.engineeringlab</groupId>
+    <artifactId>stratify-bom</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Stratify BOM</name>
+    <description>Bill of Materials for Stratify SEA Framework</description>
+
+    <properties>
+        <stratify.version>1.0.0-SNAPSHOT</stratify.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Core Modules -->
+            <dependency>
+                <groupId>dev.engineeringlab</groupId>
+                <artifactId>stratify-annotations</artifactId>
+                <version>${stratify.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.engineeringlab</groupId>
+                <artifactId>stratify-core</artifactId>
+                <version>${stratify.version}</version>
+            </dependency>
+
+            <!-- Plugin Modules -->
+            <dependency>
+                <groupId>dev.engineeringlab</groupId>
+                <artifactId>stratify-plugin-core</artifactId>
+                <version>${stratify.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.engineeringlab</groupId>
+                <artifactId>stratify-plugin-maven</artifactId>
+                <version>${stratify.version}</version>
+            </dependency>
+
+            <!-- Testing Modules -->
+            <dependency>
+                <groupId>dev.engineeringlab</groupId>
+                <artifactId>stratify-archunit</artifactId>
+                <version>${stratify.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
