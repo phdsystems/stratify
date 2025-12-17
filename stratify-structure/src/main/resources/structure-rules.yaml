@@ -1,0 +1,75 @@
+# SEA-4 Compliant Structure Rules for Stratify-Structure
+# Reference: sea-4-eliminating-common-layer.md
+# Format: YAML (requires SnakeYAML dependency)
+
+rules:
+  # SS-001: API Module Exists
+  SS-001:
+    name: "API Module Exists"
+    description: "Modules must have an API layer ({base}-api) that defines public contracts"
+    severity: ERROR
+    enabled: true
+    reason: "API layer is required to define stable public contracts and ensure proper encapsulation"
+    fix: "Create {base}-api module with public interfaces, DTOs, and exceptions"
+    reference: "sea-4-eliminating-common-layer.md"
+
+  # SS-002: Core Module Exists
+  SS-002:
+    name: "Core Module Exists"
+    description: "Modules must have a Core layer ({base}-core) that implements business logic"
+    severity: ERROR
+    enabled: true
+    reason: "Core layer is required to implement business logic and domain models"
+    fix: "Create {base}-core module with implementation classes and domain logic"
+    reference: "sea-4-eliminating-common-layer.md"
+
+  # SS-003: Facade Module Exists
+  SS-003:
+    name: "Facade Module Exists"
+    description: "Modules must have a Facade layer ({base}-facade) that provides simplified access"
+    severity: ERROR
+    enabled: true
+    reason: "Facade layer is required to enforce access control and provide simplified interfaces per ADR-005"
+    fix: "Create {base}-facade module that delegates to API and serves as the only dependency for consumers"
+    reference: "sea-4-eliminating-common-layer.md"
+
+  # SS-004: SPI Module Conditional
+  SS-004:
+    name: "SPI Module Conditional"
+    description: "SPI module ({base}-spi) is recommended when provider implementations are detected"
+    severity: WARNING
+    enabled: true
+    reason: "SPI layer enables extensibility through provider interfaces when multiple implementations exist"
+    fix: "Create {base}-spi module with provider interfaces if extensibility is needed"
+    reference: "sea-4-eliminating-common-layer.md"
+
+  # SS-005: Component Completeness
+  SS-005:
+    name: "Component Completeness"
+    description: "API and Core modules must exist together as a complete component"
+    severity: ERROR
+    enabled: true
+    pattern: "^(.+)-(api|core|spi|facade)$"
+    reason: "API without Core or Core without API creates incomplete components that violate encapsulation"
+    fix: "Ensure both {base}-api and {base}-core exist for each component"
+    reference: "sea-4-eliminating-common-layer.md"
+
+  # SS-006: No Common Layer
+  SS-006:
+    name: "No Common Layer"
+    description: "Common layer is an anti-pattern per SEA-4 and must not be used"
+    severity: ERROR
+    enabled: true
+    reason: "Common layer creates hidden coupling, violates encapsulation, and becomes a dumping ground for unrelated code"
+    fix: "Migrate using Strategy A (move to API), Strategy B (create purpose-named modules), or Strategy C (duplicate in layer-local utilities)"
+    reference: "sea-4-eliminating-common-layer.md"
+
+  # SS-007: No Util Modules
+  SS-007:
+    name: "No Util Modules"
+    description: "Util or utils modules are anti-patterns that indicate missing domain abstractions"
+    severity: ERROR
+    enabled: true
+    reason: "Util modules become dumping grounds for unrelated code and hide missing domain concepts"
+    fix: "Create proper domain objects or purpose-named modules (e.g., validation, formatting, parsing)"
+    reference: "sea-4-eliminating-common-layer.md"
