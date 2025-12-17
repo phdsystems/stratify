@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>dev.engineeringlab</groupId>
-            <artifactId>stratify-annotations</artifactId>
+            <artifactId>annotations-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>dev.engineeringlab</groupId>
-            <artifactId>stratify-annotations</artifactId>
+            <artifactId>annotations-api</artifactId>
         </dependency>
     </dependencies>
 </project>

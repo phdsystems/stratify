@@ -6,24 +6,18 @@
 
     <parent>
         <groupId>dev.engineeringlab</groupId>
-        <artifactId>stratify-parent</artifactId>
+        <artifactId>stratify-annotations</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>stratify-rules</artifactId>
+    <artifactId>annotations-api</artifactId>
     <packaging>jar</packaging>
 
-    <name>Stratify Rules</name>
-    <description>Zero-dependency SEA architecture rules for validation</description>
+    <name>Stratify Annotations API</name>
+    <description>Compile-time annotations for SEA layer marking and validation</description>
 
     <dependencies>
-        <dependency>
-            <groupId>dev.engineeringlab</groupId>
-            <artifactId>annotations-api</artifactId>
-        </dependency>
-
-        <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -44,7 +38,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>dev.engineeringlab.stratify.rules</Automatic-Module-Name>
+                            <Automatic-Module-Name>dev.engineeringlab.stratify.annotation</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>

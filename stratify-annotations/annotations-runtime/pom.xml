@@ -6,24 +6,32 @@
 
     <parent>
         <groupId>dev.engineeringlab</groupId>
-        <artifactId>stratify-parent</artifactId>
+        <artifactId>stratify-annotations</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>stratify-rules</artifactId>
+    <artifactId>annotations-runtime</artifactId>
     <packaging>jar</packaging>
 
-    <name>Stratify Rules</name>
-    <description>Zero-dependency SEA architecture rules for validation</description>
+    <name>Stratify Annotations Runtime</name>
+    <description>Runtime utilities for provider discovery and service registry</description>
 
     <dependencies>
+        <!-- Annotations API -->
         <dependency>
             <groupId>dev.engineeringlab</groupId>
             <artifactId>annotations-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
-        <!-- Test dependencies -->
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -44,7 +52,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>dev.engineeringlab.stratify.rules</Automatic-Module-Name>
+                            <Automatic-Module-Name>dev.engineeringlab.stratify.runtime</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
