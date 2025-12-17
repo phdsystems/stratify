@@ -1,12 +1,23 @@
 package dev.engineeringlab.stratify.structure.cli;
 
+import dev.engineeringlab.stratify.structure.backup.api.BackupManager;
+import dev.engineeringlab.stratify.structure.backup.facade.Backups;
+import dev.engineeringlab.stratify.structure.model.Category;
 import dev.engineeringlab.stratify.structure.model.ModuleInfo;
+import dev.engineeringlab.stratify.structure.model.Severity;
+import dev.engineeringlab.stratify.structure.model.StructureViolation;
+import dev.engineeringlab.stratify.structure.remediation.model.FixStatus;
+import dev.engineeringlab.stratify.structure.remediation.model.StructureFixResult;
+import dev.engineeringlab.stratify.structure.remediation.report.RemediationReportGenerator;
+import dev.engineeringlab.stratify.structure.remediation.report.RemediationReportGenerator.RemediationReportContext;
+import dev.engineeringlab.stratify.structure.remediation.report.RemediationReportGenerator.VerificationResult;
 import dev.engineeringlab.stratify.structure.scanner.ModuleScanner;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -149,6 +160,9 @@ public final class StructureScanner {
   }
 
   public void remediate(Path projectRoot, boolean apply) throws Exception {
+    Instant startTime = Instant.now();
+    long startMs = System.currentTimeMillis();
+
     System.out.println("=".repeat(80));
     System.out.println("Stratify Structure Remediation");
     System.out.println("=".repeat(80));
@@ -157,31 +171,74 @@ public final class StructureScanner {
     System.out.println();
 
     List<ModuleInfo> modules = ModuleScanner.scan(projectRoot);
-    int totalActions = 0;
+    List<StructureFixResult> results = new ArrayList<>();
+    List<String> filesModified = new ArrayList<>();
+    BackupManager backupManager = Backups.createManager(projectRoot);
 
     for (ModuleInfo module : modules) {
       if (module.hasCommon()) {
-        totalActions += remediateCommonLayer(module, apply);
+        List<StructureFixResult> commonResults =
+            remediateCommonLayer(module, apply, backupManager, filesModified);
+        results.addAll(commonResults);
       }
       if (module.hasUtil()) {
-        totalActions += remediateUtilLayer(module, apply);
+        List<StructureFixResult> utilResults =
+            remediateUtilLayer(module, apply, backupManager, filesModified);
+        results.addAll(utilResults);
       }
     }
 
+    long durationMs = System.currentTimeMillis() - startMs;
+
+    // Calculate statistics
+    int successCount = (int) results.stream().filter(r -> r.status() == FixStatus.FIXED).count();
+    int failedCount = (int) results.stream().filter(StructureFixResult::isFailed).count();
+    int skippedCount =
+        (int)
+            results.stream()
+                .filter(r -> r.status() == FixStatus.SKIPPED || r.status() == FixStatus.NOT_FIXABLE)
+                .count();
+    int dryRunCount = (int) results.stream().filter(r -> r.status() == FixStatus.DRY_RUN).count();
+
+    // Print summary
     System.out.println("=".repeat(80));
     if (apply) {
-      System.out.printf("Remediation complete: %d actions applied%n", totalActions);
+      System.out.printf("Remediation complete: %d actions applied%n", successCount);
     } else {
-      System.out.printf("Dry-run complete: %d actions planned%n", totalActions);
+      System.out.printf("Dry-run complete: %d actions planned%n", dryRunCount);
       System.out.println("Run with --apply to execute changes");
     }
     System.out.println("=".repeat(80));
+
+    // Generate report if we actually did something
+    if (!results.isEmpty() && apply) {
+      RemediationReportGenerator reportGenerator = new RemediationReportGenerator();
+      RemediationReportContext context =
+          RemediationReportContext.builder()
+              .timestamp(startTime)
+              .projectPath(projectRoot)
+              .durationMs(durationMs)
+              .totalAttempted(results.size())
+              .successCount(successCount)
+              .failedCount(failedCount)
+              .skippedCount(skippedCount)
+              .fixes(results)
+              .filesModified(filesModified)
+              .verification(VerificationResult.success())
+              .build();
+
+      Path reportPath = reportGenerator.generateAndSave(context);
+      System.out.println("Report saved to: " + reportPath);
+    }
   }
 
-  private int remediateCommonLayer(ModuleInfo module, boolean apply) throws IOException {
+  private List<StructureFixResult> remediateCommonLayer(
+      ModuleInfo module, boolean apply, BackupManager backupManager, List<String> filesModified)
+      throws IOException {
     System.out.println("REMEDIATE: " + module.baseName() + "-common");
     System.out.println("-".repeat(80));
 
+    List<StructureFixResult> results = new ArrayList<>();
     Path commonPath = module.path().resolve(module.baseName() + "-common");
     Path commonSrc = commonPath.resolve("src/main/java");
     Path apiSrc = module.path().resolve(module.baseName() + "-api/src/main/java");
@@ -189,10 +246,9 @@ public final class StructureScanner {
 
     if (!Files.isDirectory(commonSrc)) {
       System.out.println("  No source files found in common module");
-      return 0;
+      return results;
     }
 
-    int actions = 0;
     try (Stream<Path> files = Files.walk(commonSrc)) {
       List<Path> javaFiles = files.filter(p -> p.toString().endsWith(".java")).toList();
 
@@ -218,41 +274,73 @@ public final class StructureScanner {
         System.out.printf("         %s%n", reason);
         System.out.printf("         -> %s%n", module.path().relativize(targetFile));
 
+        StructureViolation violation =
+            StructureViolation.builder()
+                .ruleId("SS-006")
+                .ruleName("NoCommonLayer")
+                .target(module.baseName() + "-common")
+                .message(
+                    "File in common module should be in "
+                        + (targetDir.equals(apiSrc) ? "api" : "core"))
+                .severity(Severity.WARNING)
+                .category(Category.STRUCTURE)
+                .location(file.toString())
+                .fix("Move to " + targetDir.getFileName())
+                .build();
+
         if (apply) {
+          // Backup first
+          backupManager.backup(file);
+
           Files.createDirectories(targetFile.getParent());
           Files.move(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+          filesModified.add(targetFile.toString());
+
+          results.add(
+              StructureFixResult.success(
+                  violation,
+                  List.of(targetFile),
+                  "Moved " + relativePath + " to " + targetDir.getFileName()));
+        } else {
+          results.add(
+              StructureFixResult.dryRun(
+                  violation,
+                  List.of(targetFile),
+                  "Would move " + relativePath + " to " + targetDir.getFileName(),
+                  List.of()));
         }
-        actions++;
       }
     }
 
     // Delete empty common module
-    if (apply && actions > 0) {
+    if (apply && !results.isEmpty()) {
       System.out.printf("  [DELETE] %s-common (empty after migration)%n", module.baseName());
       deleteDirectory(commonPath);
-    } else if (actions > 0) {
+    } else if (!results.isEmpty()) {
       System.out.printf(
           "  [DELETE] %s-common (will be empty after migration)%n", module.baseName());
     }
 
     System.out.println();
-    return actions;
+    return results;
   }
 
-  private int remediateUtilLayer(ModuleInfo module, boolean apply) throws IOException {
+  private List<StructureFixResult> remediateUtilLayer(
+      ModuleInfo module, boolean apply, BackupManager backupManager, List<String> filesModified)
+      throws IOException {
     System.out.println("REMEDIATE: " + module.baseName() + "-util");
     System.out.println("-".repeat(80));
 
+    List<StructureFixResult> results = new ArrayList<>();
     Path utilPath = module.path().resolve(module.baseName() + "-util");
     Path utilSrc = utilPath.resolve("src/main/java");
     Path coreSrc = module.path().resolve(module.baseName() + "-core/src/main/java");
 
     if (!Files.isDirectory(utilSrc)) {
       System.out.println("  No source files found in util module");
-      return 0;
+      return results;
     }
 
-    int actions = 0;
     try (Stream<Path> files = Files.walk(utilSrc)) {
       List<Path> javaFiles = files.filter(p -> p.toString().endsWith(".java")).toList();
 
@@ -262,23 +350,49 @@ public final class StructureScanner {
 
         System.out.printf("  [MOVE] %s -> core%n", relativePath);
 
+        StructureViolation violation =
+            StructureViolation.builder()
+                .ruleId("SS-007")
+                .ruleName("NoUtilModules")
+                .target(module.baseName() + "-util")
+                .message("File in util module should be in core")
+                .severity(Severity.WARNING)
+                .category(Category.STRUCTURE)
+                .location(file.toString())
+                .fix("Move to core module")
+                .build();
+
         if (apply) {
+          // Backup first
+          backupManager.backup(file);
+
           Files.createDirectories(targetFile.getParent());
           Files.move(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+          filesModified.add(targetFile.toString());
+
+          results.add(
+              StructureFixResult.success(
+                  violation, List.of(targetFile), "Moved " + relativePath + " to core"));
+        } else {
+          results.add(
+              StructureFixResult.dryRun(
+                  violation,
+                  List.of(targetFile),
+                  "Would move " + relativePath + " to core",
+                  List.of()));
         }
-        actions++;
       }
     }
 
-    if (apply && actions > 0) {
+    if (apply && !results.isEmpty()) {
       System.out.printf("  [DELETE] %s-util%n", module.baseName());
       deleteDirectory(utilPath);
-    } else if (actions > 0) {
+    } else if (!results.isEmpty()) {
       System.out.printf("  [DELETE] %s-util (will be empty after migration)%n", module.baseName());
     }
 
     System.out.println();
-    return actions;
+    return results;
   }
 
   private boolean isApiCandidate(String fileName, String content) {
