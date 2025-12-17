@@ -43,8 +43,7 @@ MyProvider provider = registry.getDefaultOrThrow();
 |--------|---------|
 | `stratify-annotations` | @SEAModule, @Provider, @Facade, @Internal |
 | `stratify-core` | Registry, ProviderDiscovery, Config |
-| `stratify-plugin-maven` | Build-time SEA validation |
-| `stratify-archunit` | ArchUnit rules for tests |
+| `stratify-rules` | Zero-dependency SEA architecture rules |
 | `stratify-archetype` | Scaffold new SEA modules |
 
 ## Documentation

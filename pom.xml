@@ -31,7 +31,7 @@
         <module>stratify-bom</module>
         <module>stratify-annotations</module>
         <module>stratify-core</module>
-        <module>stratify-archunit</module>
+        <module>stratify-rules</module>
         <module>stratify-examples</module>
     </modules>
 
@@ -47,6 +47,8 @@
 
         <!-- Dependencies -->
         <slf4j.version>2.0.9</slf4j.version>
+        <jackson.version>2.18.2</jackson.version>
+        <lombok.version>1.18.36</lombok.version>
         <archunit.version>1.3.0</archunit.version>
         <junit.version>5.10.1</junit.version>
         <assertj.version>3.24.2</assertj.version>
@@ -85,7 +87,7 @@
             </dependency>
             <dependency>
                 <groupId>dev.engineeringlab</groupId>
-                <artifactId>stratify-archunit</artifactId>
+                <artifactId>stratify-rules</artifactId>
                 <version>${stratify.version}</version>
             </dependency>
 
@@ -94,6 +96,26 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+
+            <!-- Jackson -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- ArchUnit -->
