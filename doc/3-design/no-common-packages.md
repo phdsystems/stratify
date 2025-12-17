@@ -104,6 +104,16 @@ Each package is now:
 3. **Discoverable** — `config.YamlConfigurationLoader` is obvious
 4. **Proper name** — Describes what it does, not where it's used
 
+## Nuances
+
+1. **The problem is naming, not reuse** - Shared code isn't bad. Lazy naming that creates dumping grounds is bad.
+
+2. **Small bounded modules exist** - A `config` module used by 5 packages is fine. It's cohesive (all config-related) and bounded (won't attract random classes).
+
+3. **Language matters** - Rust's module system naturally encourages purpose-named modules. Languages without strong module systems may struggle more.
+
+4. **Refactoring path** - If you inherit a `common` package, don't just rename it. Split it into cohesive packages first.
+
 ## Summary
 
 > "Common" is not a purpose. It's an admission of design failure.

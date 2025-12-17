@@ -114,6 +114,18 @@ Rules.commonLayer("com.example").enforce("com.example");
 Rules.all("com.example").forEach(rule -> rule.enforce(classes));
 ```
 
+## Nuances
+
+1. **The problem is naming, not static functions** - `Rules.commonLayer()` is static but acceptable. It's cohesive, bounded, and well-named.
+
+2. **Language features matter** - Rust has extension traits (`impl MyTrait for String`). Java doesn't. Some "utils" exist because the language lacks expressiveness.
+
+3. **Standard library gaps** - Sometimes `StringUtils.isBlank()` exists because `String.isBlank()` wasn't added until Java 11. Legacy reasons aren't always bad design.
+
+4. **The 3-method rule** - A focused helper with 3 related methods that stays stable for years isn't a problem. The smell is when it grows to 47 methods.
+
+5. **Factory classes are utils** - `Files`, `Paths`, `Collections` are glorified utils. They're acceptable because they're cohesive (one type) and bounded.
+
 ## Summary
 
 > "Util" is not a name. It's an admission of design failure.
